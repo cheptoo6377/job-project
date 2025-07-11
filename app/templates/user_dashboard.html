@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-container">
+        <h1 class="h3 mb-3 fw-bold text-center">Welcome to Your Dashboard</h1>
+
+    <!-- User Info Dropdown aligned right -->
+    <div class="d-flex justify-content-end">
+      <div class="dropdown mb-4">
+          <button class="btn btn-warning dropdown-toggle" type="button" id="userInfoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Profile Information
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="userInfoDropdown">
+              <li class="dropdown-item"><strong>Email:</strong> {{ user.email }}</li>
+              <li class="dropdown-item"><strong>Phone:</strong> {{ user.phone_number or 'N/A' }}</li>
+              <li class="dropdown-item"><strong>Roles:</strong> 
+                  {% set has_applicant = false %}
+                  {% for role in user.roles %}
+                      <span class="badge bg-secondary">{{ role.name.replace('_', ' ').title() }}</span>
+                      {% if role.name == 'applicant' %}{% set has_applicant = true %}{% endif %}
+                  {% endfor %}
+                  {% if not has_applicant %}
+                      <span class="badge bg-secondary">Applicant</span>
+                  {% endif %}
+              </li>
+          </ul>
+      </div>
+    </div>
+</div>
+  <!-- Available Jobs Section -->
+    <div class="available-jobs-section mt-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white text-center rounded-top">
+                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-list me-2"></i>Available Jobs</h5>
+            </div>
+            <div class="card-body p-0 pt-3">
+                {% if available_jobs %}
+                    <ul class="list-group list-group-flush">
+                    {% for job in available_jobs %}
+                        <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center align-items-start">
+                            <div class="mb-2 mb-md-0">
+                                <span class="fw-bold fs-5">{{ job.title }}</span>
+                                <span class="text-primary ms-2">@ {{ job.company }}</span>
+                                <div class="text-muted small mt-1">{{ job.description }}</div>
+                            </div>
+                            <div>
+                                <form method="post" action="{{ url_for('main.apply_to_job', job_id=job.id) }}" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="job_id" value="{{ job.id }}">
+                                  
+                                    <button class="btn btn-outline-success btn-sm" type="submit">Apply</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center py-3">No available jobs at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- User's Job Applications or Jobs Posted -->
+    
+    </div>
+
+  
+</div>
+{% endblock %}
