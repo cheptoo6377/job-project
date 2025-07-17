@@ -1,10 +1,12 @@
+from flask import request
+from flask_security import current_user
 from app import app
 from app.extension import db
 from app import models
 
 def setup_initial_data():
     from app.models import RoleModel, UserModel
-    from flask_security import hash_password
+    
     import uuid
 
     roles_data = {
@@ -25,14 +27,16 @@ def setup_initial_data():
             db.session.add(role)
     db.session.commit()
 
+
+   
+
     # Create admin user if not exists
     
       
 
  
-with app.app_context():
-    db.create_all()
-    setup_initial_data()
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
+

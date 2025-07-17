@@ -8,15 +8,14 @@ from app.forms.job_create import JobCreateForm
 from app.extension import csrf
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_security import roles_required, login_user, current_user, logout_user
+from flask_security import  current_user
 from app.models import JobModel, UserModel, RoleModel, JobApplication
 from flask import session
 # from app.forms.login import RegisterUserForm
 from flask_security.utils import hash_password, verify_password
-from app.extension import db
-from flask_principal import Identity, identity_changed
-from flask import current_app
-from flask_mail import Mail, Message
+from flask_security import logout_user
+from app.extension import db, csrf
+from flask_mail import Mail
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import uuid
 
@@ -27,10 +26,10 @@ serializer = URLSafeTimedSerializer('your-secret-key')
 
 @main.route('/')
 def index():
-    if current_user.is_authenticated:
-        if current_user.has_role('admin'):
+    if current_user:
+        if current_user('admin'):
             return redirect(url_for('main.admin_dashboard'))
-        elif current_user.has_role('applicant'):
+        elif current_user('applicant'):
             return redirect(url_for('main.user_dashboard'))
     jobs = JobModel.query.all()
     return render_template('index.html', jobs=jobs)
@@ -76,8 +75,7 @@ def apply_to_job(job_id):
     return render_template('your_jobs.html', job=job)
 @main.route('/your-jobs')
 def user_jobs():
-    user_id = UserModel.query.all().first().id  # Assuming you want the first user for demonstration
-   
+    user_id = UserModel.query.first().id  # Assuming you want the first user for demonstration
 
     applications = JobApplication.query.filter_by(user_id=user_id).all()
     user_jobs = [app.job for app in applications]
@@ -128,6 +126,10 @@ def delete_job(id):
     db.session.commit()
     
     return redirect(url_for('main.admin_dashboard'))
+@main.route('/logout' , methods=['POST'])
+def logout():
+    logout_user()
+    return redirect(url_for('main.index'))
 
 
 
