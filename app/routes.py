@@ -62,24 +62,27 @@ def user_dashboard():
 
 @main.route('/apply/<int:job_id>', methods=['POST'])
 def apply_to_job(job_id):
-   
-
+    if not current_user.is_authenticated:
+        flash('You must be logged in to apply for jobs.', 'danger')
+        return redirect(url_for('main.index'))
     job = JobModel.query.get_or_404(job_id)
-
- 
-
-    new_application = JobApplication( job_id=job_id, user_id=UserModel.query.first().id)  # Assuming you want the first user for demonstration
+    # Prevent duplicate applications
+    existing_application = JobApplication.query.filter_by(job_id=job_id, user_id=current_user.id).first()
+    if existing_application:
+        flash('You have already applied to this job.', 'warning')
+        return redirect(url_for('main.user_jobs'))
+    new_application = JobApplication(job_id=job_id, user_id=current_user.id)
     db.session.add(new_application)
     db.session.commit()
     flash('Application submitted successfully!', 'success')
-    return render_template('your_jobs.html', job=job)
+    return redirect(url_for('main.user_jobs'))
 @main.route('/your-jobs')
 def user_jobs():
-    user_id = UserModel.query.first().id  # Assuming you want the first user for demonstration
-
-    applications = JobApplication.query.filter_by(user_id=user_id).all()
+    if not current_user.is_authenticated:
+        flash('You must be logged in to view your jobs.', 'danger')
+        return redirect(url_for('main.index'))
+    applications = JobApplication.query.filter_by(user_id=current_user.id).all()
     user_jobs = [app.job for app in applications]
-
     return render_template('your_jobs.html', user_jobs=user_jobs)
 
 
