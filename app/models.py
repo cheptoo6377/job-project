@@ -17,9 +17,9 @@ class JobModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
-
     company = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    
+    
 
     def __repr__(self):
         return f'<Job {self.title} at {self.company}>'
@@ -46,7 +46,7 @@ class UserModel(db.Model, UserMixin):
 
     # roles relationship
     roles = db.relationship('RoleModel', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
-    jobs = db.relationship('JobModel', backref='user', lazy=True)
+    
 
     def __repr__(self):
         return f"<User {self.email} {self.roles}>"

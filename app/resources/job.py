@@ -9,7 +9,7 @@ job_fields = {
     'title': fields.String,
     'description': fields.String,
     'company': fields.String,
-    'user_id': fields.Integer
+
 }
 
 # Resource to handle job list and creation
@@ -33,13 +33,11 @@ class Jobs(Resource):
         if missing:
             return {'message': 'Missing required fields', 'missing': missing}, 400
 
-        # Optionally assign job to a user if user_id is provided (e.g., by employer)
-        user_id = data.get('user_id')
+        # Create job without user_id
         new_job = JobModel(
             title=data['title'],
             description=data['description'],
-            company=data['company'],
-            user_id=user_id if user_id else None
+            company=data['company']
         )
         db.session.add(new_job)
         db.session.commit()

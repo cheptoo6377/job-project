@@ -9,26 +9,10 @@
 
     <!-- User Info Dropdown aligned right -->
     <div class="d-flex justify-content-end">
-      <div class="dropdown mb-4">
-          <button class="btn btn-warning dropdown-toggle" type="button" id="userInfoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              Profile Information
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="userInfoDropdown">
-              <li class="dropdown-item"><strong>Email:</strong> {{ user.email }}</li>
-              <li class="dropdown-item"><strong>Phone:</strong> {{ user.phone_number or 'N/A' }}</li>
-              <li class="dropdown-item"><strong>Roles:</strong> 
-                  {% set has_applicant = false %}
-                  {% for role in user.roles %}
-                      <span class="badge bg-secondary">{{ role.name.replace('_', ' ').title() }}</span>
-                      {% if role.name == 'applicant' %}{% set has_applicant = true %}{% endif %}
-                  {% endfor %}
-                  {% if not has_applicant %}
-                      <span class="badge bg-secondary">Applicant</span>
-                  {% endif %}
-              </li>
-          </ul>
-      </div>
+     <a href="{{ url_for('main.logout') }}" class="btn btn-info m-2">Logout</a>
+
     </div>
+    
 </div>
   <!-- Available Jobs Section -->
     <div class="available-jobs-section mt-5">

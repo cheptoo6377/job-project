@@ -12,14 +12,17 @@
         <h1>Findjob Website</h1>
         <nav>
             <ul>
-                {% if not current_user %}
+                {% if not current_user.is_authenticated %}
                     <li><a href="{{ url_for('main.index') }}">Home</a></li>
-                    <li><a href="{{ url_for('security.login') }}">Login</a></li>
-                    <li><a href="{{ url_for('security.register') }}">Register</a></li>
+                   
                 {% else %}
                     <li><a href="{{ url_for('main.index') }}">Home</a></li>
-                  
-
+                    <li><a href="{{ url_for('main.logout') }}">Profile</a></li>
+                    <li>
+                        <form action="{{ url_for('main.logout') }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-link nav-link" style="padding:0;">Logout</button>
+                        </form>
+                    </li>
                     {% if current_user.has_role('admin') %}
                         <li><a href="{{ url_for('main.admin_dashboard') }}">Admin Dashboard</a></li>
                     {% endif %}

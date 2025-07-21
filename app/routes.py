@@ -26,10 +26,10 @@ serializer = URLSafeTimedSerializer('your-secret-key')
 
 @main.route('/')
 def index():
-    if current_user:
-        if current_user('admin'):
+    if current_user.is_authenticated:
+        if current_user.has_role('admin'):
             return redirect(url_for('main.admin_dashboard'))
-        elif current_user('applicant'):
+        elif current_user.has_role('applicant'):
             return redirect(url_for('main.user_dashboard'))
     jobs = JobModel.query.all()
     return render_template('index.html', jobs=jobs)
@@ -50,6 +50,7 @@ def admin_dashboard():
         recent_users=recent_users,
         jobs=jobs
     )
+
 
 @main.route('/user/dashboard')
 def user_dashboard():
