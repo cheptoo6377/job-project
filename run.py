@@ -27,15 +27,17 @@ def setup_initial_data():
             db.session.add(role)
     db.session.commit()
 
-
+    
    
 
+
     # Create admin user if not exists
-    
-      
+    from flask_security.utils import hash_password
+   
 
  
-    
+# Initialize the database and create initial data
+
 
 if __name__ == "__main__":
     app.run(debug=True)

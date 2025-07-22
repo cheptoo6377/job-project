@@ -61,30 +61,43 @@ def user_dashboard():
 
 # Apply to job route
 
+        
 @main.route('/apply/<int:job_id>', methods=['POST'])
 def apply_to_job(job_id):
-    if not current_user.is_authenticated:
-        flash('You must be logged in to apply for jobs.', 'danger')
+    # NOTE: Replace this with your own user_id retrieval logic (e.g., from form or session)
+    user_id = request.form.get('user_id')  # Example fallback
+
+    if not user_id:
+        flash('User ID is required to apply for jobs.', 'danger')
         return redirect(url_for('main.index'))
+
     job = JobModel.query.get_or_404(job_id)
+
     # Prevent duplicate applications
-    existing_application = JobApplication.query.filter_by(job_id=job_id, user_id=current_user.id).first()
+    existing_application = JobApplication.query.filter_by(job_id=job_id, user_id=user_id).first()
     if existing_application:
         flash('You have already applied to this job.', 'warning')
-        return redirect(url_for('main.user_jobs'))
-    new_application = JobApplication(job_id=job_id, user_id=current_user.id)
+        return redirect(url_for('main.user_jobs', user_id=user_id))
+
+    new_application = JobApplication(job_id=job_id, user_id=user_id)
     db.session.add(new_application)
     db.session.commit()
     flash('Application submitted successfully!', 'success')
-    return redirect(url_for('main.user_jobs'))
+    return redirect(url_for('main.user_jobs', user_id=user_id))
+
+
 @main.route('/your-jobs')
 def user_jobs():
-    if not current_user.is_authenticated:
-        flash('You must be logged in to view your jobs.', 'danger')
+    user_id = request.args.get('user_id')  # Accept user_id from query param
+
+    if not user_id:
+        flash('User ID is required to view your jobs.', 'danger')
         return redirect(url_for('main.index'))
-    applications = JobApplication.query.filter_by(user_id=current_user.id).all()
+
+    applications = JobApplication.query.filter_by(user_id=user_id).all()
     user_jobs = [app.job for app in applications]
     return render_template('your_jobs.html', user_jobs=user_jobs)
+
 
 
 from flask import Blueprint, render_template
