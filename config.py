@@ -3,11 +3,17 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-
+def get_database_uri():
+    db_url = os.getenv('DATABASE_URL')
+    if db_url:
+        return db_url
+    # Use /tmp for SQLite in serverless (Vercel) environments
+    if os.getenv('VERCEL') or os.getenv('VERCEL_ENV'):
+        return 'sqlite:////tmp/api.db'
+    return 'sqlite:///api.db'
 
 class Config:
-    # Use DATABASE_URL for production, fallback to SQLite for local development
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///api.db')
+    SQLALCHEMY_DATABASE_URI = get_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('SECRET_KEY','my_strong_secret')
     BASE_API_URL = os.getenv('API_URL')  
